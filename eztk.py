@@ -30,92 +30,74 @@ def ezplace(object, x, y, side, fill=None):
         object.pack(side=side, fill=fill)
 
 class widgets():
+    # MAIN WINDOW
+    def mkwindow(title="tk", size="852x480", bg="#FFFFFF", icon="", hResizable="False", wResizable="False", whenClosed=None):
+        tk = Tk()
+        tk.title(title)
+        tk.geometry(size)
+        tk.configure(bg=bg)
+        tk.resizable(wResizable, hResizable)
+        if icon:
+            tk.iconbitmap(icon)
+        if whenClosed:
+            tk.protocol("WM_DELETE_WINDOW", whenClosed)
+        return tk
     # PLAIN TEXT
-    def mklabel(self, text="Sample", x=0, y=0, side=""):
-        return self.mk_label.make(self.tk, text, x, y, side)
-    class mk_label():
-        def make(parent, text, x, y, side):
-            self = tk.Label(parent, text=text)
-            ezplace(self, x, y, side)
-            return self
+    def mklabel(parent, text="Sample", x=0, y=0, side="", bg="#FFFFFF"):
+        label = tk.Label(parent, text=text, bg=bg)
+        ezplace(label, x, y, side)
+        return label
     # SMALL INPUT BOX
-    def mkentry(self, var="", x=0, y=0, side=""):
-        return self.mk_entry.make(self.tk, var, x, y, side)
-    class mk_entry():
-        def make(parent, var, x, y, side):
-            self = tk.Entry(parent, textvariable=var)
-            ezplace(self, x, y, side)
-            return self
+    def mkentry(parent, var="", x=0, y=0, side="", bg="#FFFFFF"):
+        entry = tk.Entry(parent, textvariable=var, bg=bg)
+        ezplace(entry, x, y, side)
+        return entry
     # SIMPLE BUTTON
-    def mkbutton(self, text="Sample", command="", width=15, height=1, x=0, y=0, side=""):
-        return self.mk_button.make(self.tk, text, command, width, height, x, y, side)
-    class mk_button():
-        def make(parent, text, command, width, height, x, y, side):
-            self = tk.Button(parent, text=text, width=width, height=height, command=command)
-            ezplace(self, x, y, side)
-            return self
+    def mkbutton(parent, text="Sample", command="", width=15, height=5, x=0, y=0, side="", bg="#FFFFFF", activebg="#FFFFFF"):
+        button = tk.Button(parent, text=text, width=width, height=height, command=command, bg=bg, activebackground=activebg)
+        ezplace(button, x, y, side)
+        return button
     # CHECKBOX
-    def mkcheck(self, var, text="Sample", x=0, y=0, side="", bg="#FFFFFF", activebg="#FFFFFF"):
-        return self.mk_check.make(self.tk, var, text, x, y, side, bg, activebg)
-    class mk_check():
-        def make(parent, var, text, x, y, side, bg, activebg):
-            self = tk.Checkbutton(parent, text=text, variable=var, bg=bg, activebackground=activebg)
-            ezplace(self, x, y, side)
-            return self
+    def mkcheck(parent, variable, text="Sample", x=0, y=0, side="", bg="#FFFFFF", activebg="#FFFFFF"):
+        check = tk.Checkbutton(parent, text=text, variable=variable, bg=bg, activebackground=activebg)
+        ezplace(check, x, y, side)
+        return check
     # LIST OF RADIO BUTTONS
-    def mkradiobuttons(self, names=["Sample"], x=0, y=0, side="", clearx=0, cleary=20, bg="#FFFFFF", activebg="#FFFFFF"):
-        return self.mk_radiobuttons(self.tk, names, x, y, side, clearx, cleary, bg, activebg)
-    class mk_radiobuttons():
-        # This creates several objects at the same time so it doesn't return a tkinter object
-        # Use only if accessing other variables after being created is not necessary.
-        # The variable that stores the number of the option selected is self.variable, you can get it with self.getvar()
-        def __init__(self, parent, names, x, y, side, clearx, cleary, bg, activebg):
-            self.parent = parent
-            self.variable = IntVar()
-            self.lastposition = 0
-            self.buttons = {}
-            names = list(names)
-            self.add(names, x, y, side, clearx, cleary, bg, activebg)
-        def add(self, names, x=0, y=0, side="", clearx=0, cleary=20, bg="#FFFFFF", activebg="#FFFFFF"):
-            names = list(names)
+    def mkradiobutton_multiple(parent, names=["Sample"], x=0, y=0, side="", clearx=0, cleary=20, bg="#FFFFFF", activebg="#FFFFFF"):
+        # This will return a dictionary which contains: the buttons as tkinter objects, and the variable that stores which button of the same group is active
+        variable = IntVar()
+        buttons = []
+        names = list(names)
+        for i in range(len(names)):
+            buttons[i] = tk.Radiobutton(parent, text=names[i], variable=variable, value = i, bg=bg, activebackground=activebg)
+            ezplace(buttons[i], x+clearx*i, y+cleary*i, side=side)
+        returned = {"variable": variable, "buttons": buttons}
+        return returned
+    def mkradiobutton_single(parent, name, variable, value, x=0, y=0, side="", bg="#FFFFFF", activebg="FFFFFF"):
+        radiobutton = tk.Radiobutton(parent, text=name, variable=variable, value=value, bg=bg, activebackground=activebg)
+        ezplace(radiobutton, x=x, y=y, side=side)
+        return radiobutton
+    # LISTBOX
+    def mklistbox(parent, names=["Sample"], width=80, height=150, x=0, y=0, side="", bg="#FFFFFF"):
+        listbox = tk.Listbox(parent, width=width, height=height, bg=bg)
+        ezplace(listbox, x=x, y=y, side=side)
+        list(names)
+        for i in range(len(names)):
+            listbox.insert(index=i, elements=names[i])
+        return listbox
+    def modifylistbox(listbox, startposition=0, names=["Sample"], delete=[-1, -1]):
+        # Can either replace single or pultiple entries starting from a specific position(with startposition and names[])
+        # Or delete several entries with delete[] (can't do both) with delete, you need to pass a list with two indexes, like this: [first_index, last_index]
+        # Both are included and the positions will remain empty (even though it will not be rendered blank on the GUI), for you to replace the spaces
+        if delete[0] >= 0 and delete[1] >=0:
+            listbox.delete(delete[0], delete[1])
+        else:
             for i in range(len(names)):
-                self.buttons[names[i]] = tk.Radiobutton(self.parent, text=names[i], variable=self.variable, value=self.lastposition, bg=bg, activebackground=activebg)
-                ezplace(self.buttons[names[i]], x+clearx*i, y+cleary*i, side=side)
-                self.lastposition += 1
-        def getvar(self):
-            return self.variable.get()
-    # LIST
-    def mklistbox(self, names=["Sample"], start_position=-1, width=80, height=150, x=0, y=0, side="", bg="#FFFFFF"):
-        return self.mk_listbox(self.tk, names, start_position, width, height, x, y, side, bg)
-    class mk_listbox():
-        # This will also not return a tkinter object as it needs multiple children objects, again self.getvar() to get the selected box
-        def __init__(self, parent, names, start_position, width, height, x, y, side, bg):
-            self.parent = parent
-            self.object = tk.Listbox(parent, width=width, height=height, bg=bg)
-            ezplace(self.object, x, y, side)
-            self.lastposition = 0
-            self.selection = int
-            self.add(names, start_position)
-        def add(self, names, start_position):
-            names = list(names)
-            if start_position < -1:
-                print("Wrong index!")
-                return 1
-            if start_position >= self.lastposition or start_position == -1:
-                for i in range(len(names)):
-                    self.object.insert(self.lastposition, names[i])
-                    self.lastposition += 1
-            else:
-                for i in range(len(names)):
-                    if start_position < self.lastposition:
-                        self.object.delete(start_position)
-                        self.object.insert(start_position, names[i])
-                        start_position += 1
-                    if start_position >= self.lastposition:
-                        self.lastposition += 1
-        def getvar(self):
-            return self.object.curselection()[0]
-    # BIG INPUT BOX
+                listbox.delete(startposition)
+                listbox.insert(index=startposition, elements=names[i])
+                startposition += 1
+        return listbox
+    # BIG INPUT BOX TODO: FIX CHANGE TO FUNCTION
     def mktextbox(self, x=0, y=0, width=50, height=50, side=""):
         return self.mk_textbox.make(self.tk, x, y, width, height, side)
     class mk_textbox():
@@ -123,7 +105,7 @@ class widgets():
             self = Text(parent, width=width, height=height)
             ezplace(self, x, y, side)
             return self
-    # BIG INPUT BOX WITH SCROLL BAR
+    # BIG INPUT BOX WITH SCROLL BAR TODO: FIX CHANGE TO FUNCTION
     def mkscrolledtextbox(self, x=0, y=0, width=50, height=50, side=""):
         return self.mk_scrolledtextbox.make(self.tk, x, y, width, height, side)
     class mk_scrolledtextbox():
@@ -131,7 +113,7 @@ class widgets():
             self = ScrolledText(parent, width=width, height=height)
             ezplace(self, x, y, side)
             return self
-    # TOP VIEW MENU
+    # TOP VIEW MENU TODO: FIX CHANGE TO FUNCTION
     def mktopmenu(self):
         return self.mk_topmenu(self.tk)
     class mk_topmenu():
@@ -157,8 +139,8 @@ class widgets():
             class mk_separator():
                 def __init__(self, parent):
                     parent.add_separator()
-    def mkscrollbar(self, width=18, orient="vertical", fill="none", side="right"):
-        scrollbar = tk.Scrollbar(self.tk, orient=orient, width=width)
+    def mkscrollbar(parent, width=18, orient="vertical", fill="none", side="right"):
+        scrollbar = tk.Scrollbar(parent, orient=orient, width=width)
         ezplace(scrollbar, x="", y="", side=side, fill=fill)
         return scrollbar
 #    # LABELED FRAME
