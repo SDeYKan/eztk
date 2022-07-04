@@ -2,12 +2,11 @@
 import tkinter as tk
 from tkinter import ttk
 from tkinter import *
+from tkinter import messagebox
 from tkinter.scrolledtext import ScrolledText
-from turtle import width
 
-# todo: add treeview, add messagebox(if useful)
-# todo add images, canvas, optionmenu/combobox, progressbar(?)
-# todo: add a way to include a scrollbar to a widget
+# todo: add treeview, image, combobox, progressbar, canvas?
+# todo: addscrollbar() upgraded function
 # todo: change nomenclature to add clarity
 
 def ezvalue(object):
@@ -86,12 +85,12 @@ class widgets():
         ezplace(radiobutton, x=x, y=y, side=side)
         return radiobutton
     # LISTBOX
-    def mklistbox(parent, names=["Sample"], width=80, height=150, x=0, y=0, side="", bg="#FFFFFF"):
+    def mklistbox(parent, names=["Sample"], width=80, height=20, x=0, y=0, side="", bg="#FFFFFF"):
         listbox = tk.Listbox(parent, width=width, height=height, bg=bg)
         ezplace(listbox, x=x, y=y, side=side)
         list(names)
         for i in range(len(names)):
-            listbox.insert(index=i, elements=names[i])
+            listbox.insert(i, names[i])
         return listbox
     def modifylistbox(listbox, startposition=0, names=["Sample"], delete=[-1, -1]):
         # Can either replace single or pultiple entries starting from a specific position(with startposition and names[])
@@ -102,7 +101,7 @@ class widgets():
         else:
             for i in range(len(names)):
                 listbox.delete(startposition)
-                listbox.insert(index=startposition, elements=names[i])
+                listbox.insert(startposition, names[i])
                 startposition += 1
         return listbox
     # BIG INPUT BOX
@@ -130,10 +129,10 @@ class widgets():
     def mkmenuseparator(parent):
         parent.add_separator()
     # SCROLL BAR
-    def mkscrollbar(parent, width=18, orient="vertical", fill="none", side="right"):
-        scrollbar = tk.Scrollbar(parent, orient=orient, width=width)
-        ezplace(scrollbar, x="", y="", side=side, fill=fill)
-        return scrollbar
+#    def mkscrollbar(parent, width=18, orient="vertical", fill="none", side="right"):
+#        scrollbar = tk.Scrollbar(parent, orient=orient, width=width)
+#        ezplace(scrollbar, x="", y="", side=side, fill=fill)
+#        return scrollbar
     # FRAME
     def mkframe(parent, width=50, height=50, x=0, y=0, side="", bg="#EEEEEE"):
         frame = tk.Frame(parent, width=width, height=height, bg=bg)
@@ -153,3 +152,7 @@ class widgets():
         tab = ttk.Frame(parent, width=width, height=height)
         parent.add(tab, text=name)
         return tab
+if __name__ == "__main__":
+    root = widgets.mkwindow()
+    list = widgets.mklistbox(root, ["hola"])
+    root.mainloop()
